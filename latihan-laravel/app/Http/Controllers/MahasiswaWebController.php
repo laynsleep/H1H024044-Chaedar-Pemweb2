@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Mahasiswa;
+use App\Models\Matakuliah;
 use Illuminate\Support\Facades\DB;
 
 class MahasiswaWebController extends Controller
@@ -55,7 +56,8 @@ class MahasiswaWebController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $mahasiswa = Mahasiswa::with('matakuliah')->find($id);
+        return view('mahasiswa.show', ['mahasiswa' => $mahasiswa]);
     }
 
     /**

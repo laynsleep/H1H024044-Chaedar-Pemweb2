@@ -5,11 +5,24 @@
 @section('konten')
 <h1 class="h3 mb-4">Detail Mahasiswa</h1>
 
-<div class="card">
-    <div class="card-body">
-        <p class="mb-0">NIM yang diminta: <strong>{{ $nim }}</strong></p>
-    </div>
-</div>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Matakuliah</th>
+            <th>SKS</th>
+            <th>Nilai</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach ($mahasiswa->matakuliah as $mk)
+        <tr>
+            <td>{{ $mk->nama }}</td>
+            <td>{{ $mk->sks }}</td>
+            <td>{{ $mk->pivot->nilai }}</td>
+        </tr>
+        @endforeach
+    </tbody>
+</table>
 
-<a href="{{ route('mahasiswa.index') }}" class="btn btn-secondary mt-3">Kembali</a>
+<a href="{{ route('mahasiswa.data') }}" class="btn btn-secondary mt-3">Kembali</a>
 @endsection
