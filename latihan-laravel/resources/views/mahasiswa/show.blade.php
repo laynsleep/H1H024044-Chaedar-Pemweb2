@@ -24,5 +24,5 @@
     </tbody>
 </table>
 
-<a href="{{ route('mahasiswa.data') }}" class="btn btn-secondary mt-3">Kembali</a>
+<a href="{{ route('mahasiswa-data.index') }}" class="btn btn-secondary mt-3">Kembali</a>
 @endsection

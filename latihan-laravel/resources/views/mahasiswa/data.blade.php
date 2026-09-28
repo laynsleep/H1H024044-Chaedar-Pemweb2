@@ -29,7 +29,7 @@
             <td>{{ $mahasiswa->angkatan }}</td>
             <td>{{ $mahasiswa->ipk }}</td>
             <td>
-                <a href="{{ route('mahasiswa.show', $mahasiswa->id) }}" class="btn btn-danger">Detail</a>
+                <a href="{{ route('mahasiswa-data.show', $mahasiswa->id) }}" class="btn btn-danger">Detail</a>
             </td>
         </tr>
         @endforeach
