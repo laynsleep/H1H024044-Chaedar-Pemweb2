@@ -5,6 +5,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Auth\AuthenticationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -34,6 +35,15 @@ return Application::configure(basePath: dirname(__DIR__))
                     'pesan' => 'Data yang dikirim tidak valid',
                     'galat' => $e->errors()
                 ], 422);
+            }
+        });
+
+        $exceptions->render(function (AuthenticationException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'sukses' => false,
+                    'pesan' => 'Token tidak valid atau belum dikirim'
+                ], 401);
             }
         });
 
