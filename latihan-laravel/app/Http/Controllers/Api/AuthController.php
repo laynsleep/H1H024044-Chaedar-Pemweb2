@@ -52,10 +52,12 @@ class AuthController extends Controller
 
         if ($pengguna === null || Hash::check($data['password'], $pengguna->password) === false) {
             return response()->json([
-                'sukses' => true,
+                'sukses' => false,
                 'pesan' => 'Email atau kata sandi tidak sesuai'
             ], 401);
         }
+
+        $pengguna->update(['terakhir_login' => now()]);
 
         $kemampuan = $pengguna->peran === 'admin'
             ? ['mahasiswa:baca', 'mahasiswa:tulis']
@@ -111,6 +113,32 @@ class AuthController extends Controller
         return response()->json([
             'sukses' => true,
             'pesan' => 'Seluruh sesi perangkat telah diakhiri'
+        ]);
+    }
+
+    public function resetPassword(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'current_password' => 'required|string',
+            'password' => ['required', Password::min(8)->letters()->numbers()]
+        ]);
+
+        $pengguna = $request->user();
+
+        if (!Hash::check($data['current_password'], $pengguna->password)) {{
+            return response()->json([
+                'sukses' => false,
+                'pesan' => 'Kata sandi lama tidak sesuai'
+            ], 400);
+        }}
+
+        $pengguna->update([
+            'password' => Hash::make($data['password'])
+        ]);
+
+        return response()->json([
+            'sukses' => true,
+            'pesan' => 'Kata sandi berhasil diubah'
         ]);
     }
 }
