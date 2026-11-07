@@ -16,27 +16,30 @@ import (
 
 func main() {
 	konf := config.Muat()
+	config.HubungkanBasisData(konf)
+	config.Migrasi()
+	config.DataAwal()
 
 	app := fiber.New(fiber.Config{
-		AppName:		konf.NamaAplikasi,
-		ErrorHandler:	penanganGalat,
+		AppName:      konf.NamaAplikasi,
+		ErrorHandler: penanganGalat,
 	})
 
 	app.Use(requestid.New())
 	app.Use(logger.New())
 	app.Use(recoverer.New())
 	app.Use(middleware.WaktuProses())
-	app.Use(middleware.KunciApi())
+	// app.Use(middleware.KunciApi())
 
 	router.Daftarkan(app)
 
 	app.Use(func(c fiber.Ctx) error {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"sukses":	false,
-			"pesan":	"Endpoint tidak tersedia",
+			"sukses": false,
+			"pesan":  "Endpoint tidak tersedia",
 		})
 	})
-	
+
 	log.Fatal(app.Listen(":" + konf.Port))
 }
 
@@ -46,13 +49,13 @@ func penanganGalat(c fiber.Ctx, err error) error {
 
 	var galatFiber *fiber.Error
 
-	if errors.As(err,  &galatFiber) {
+	if errors.As(err, &galatFiber) {
 		kode = galatFiber.Code
 		pesan = galatFiber.Message
 	}
 
 	return c.Status(kode).JSON(fiber.Map{
 		"sukses": false,
-		"pesan": pesan,
+		"pesan":  pesan,
 	})
 }
