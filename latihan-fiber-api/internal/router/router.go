@@ -23,5 +23,16 @@ func Daftarkan(app *fiber.App) {
 	mahasiswa.Get("/:id", handler.DetailMahasiswa)
 	mahasiswa.Put("/:id", handler.PerbaruiMahasiswa)
 	mahasiswa.Delete("/:id", handler.HapusMahasiswa)
+	mahasiswa.Post("/:id/pulihkan", handler.PulihkanMahasiswa)
 	mahasiswa.Get("/nim/:nim", handler.CariMahasiswa)
+
+	mataKuliah := api.Group("/matakuliah")
+
+	mataKuliah.Get("/", handler.DaftarMataKuliah)
+	mataKuliah.Post("/", handler.BuatMataKuliah)
+	mataKuliah.Get("/:id", handler.DetailMataKuliah)
+	mataKuliah.Put("/:id", handler.PerbaruiMataKuliah)
+	mataKuliah.Delete("/:id", handler.HapusMataKuliah)
+
+	api.Get("/program-studi", handler.DaftarProgramStudi)
 }
