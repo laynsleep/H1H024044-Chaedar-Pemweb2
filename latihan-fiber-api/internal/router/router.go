@@ -2,6 +2,7 @@ package router
 
 import (
 	"latihan-fiber-api/internal/handler"
+	"latihan-fiber-api/internal/middleware"
 
 	"github.com/gofiber/fiber/v3"
 )
@@ -16,23 +17,30 @@ func Daftarkan(app *fiber.App) {
 		})
 	})
 
-	mahasiswa := api.Group("/mahasiswa")
+	api.Post("/auth/registrasi", handler.Registrasi)
+	api.Post("/auth/login", handler.Login)
+
+	terlindungi := api.Group("", middleware.Autentikasi())
+
+	terlindungi.Get("/auth/profil", handler.Profil)
+
+	mahasiswa := terlindungi.Group("/mahasiswa")
 
 	mahasiswa.Get("/", handler.DaftarMahasiswa)
-	mahasiswa.Post("/", handler.BuatMahasiswa)
+	mahasiswa.Post("/", middleware.HanyaPeran("admin", "dosen"), handler.BuatMahasiswa)
 	mahasiswa.Get("/:id", handler.DetailMahasiswa)
-	mahasiswa.Put("/:id", handler.PerbaruiMahasiswa)
-	mahasiswa.Delete("/:id", handler.HapusMahasiswa)
-	mahasiswa.Post("/:id/pulihkan", handler.PulihkanMahasiswa)
+	mahasiswa.Put("/:id", middleware.HanyaPeran("admin", "dosen"), handler.PerbaruiMahasiswa)
+	mahasiswa.Delete("/:id", middleware.HanyaPeran("admin"), handler.HapusMahasiswa)
+	mahasiswa.Post("/:id/pulihkan", middleware.HanyaPeran("admin"), handler.PulihkanMahasiswa)
 	mahasiswa.Get("/nim/:nim", handler.CariMahasiswa)
 
-	mataKuliah := api.Group("/matakuliah")
+	mataKuliah := terlindungi.Group("/matakuliah")
 
 	mataKuliah.Get("/", handler.DaftarMataKuliah)
-	mataKuliah.Post("/", handler.BuatMataKuliah)
+	mataKuliah.Post("/", middleware.HanyaPeran("admin", "dosen"), handler.BuatMataKuliah)
 	mataKuliah.Get("/:id", handler.DetailMataKuliah)
-	mataKuliah.Put("/:id", handler.PerbaruiMataKuliah)
-	mataKuliah.Delete("/:id", handler.HapusMataKuliah)
+	mataKuliah.Put("/:id", middleware.HanyaPeran("admin", "dosen"), handler.PerbaruiMataKuliah)
+	mataKuliah.Delete("/:id", middleware.HanyaPeran("admin"), handler.HapusMataKuliah)
 
 	api.Get("/program-studi", handler.DaftarProgramStudi)
 }

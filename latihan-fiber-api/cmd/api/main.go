@@ -5,7 +5,6 @@ import (
 	"log"
 
 	"github.com/gofiber/fiber/v3"
-	"github.com/gofiber/fiber/v3/middleware/logger"
 	recoverer "github.com/gofiber/fiber/v3/middleware/recover"
 	"github.com/gofiber/fiber/v3/middleware/requestid"
 
@@ -26,7 +25,7 @@ func main() {
 	})
 
 	app.Use(requestid.New())
-	app.Use(logger.New())
+	// app.Use(logger.New())
 	app.Use(recoverer.New())
 	app.Use(middleware.WaktuProses())
 	// app.Use(middleware.KunciApi())
@@ -52,6 +51,10 @@ func penanganGalat(c fiber.Ctx, err error) error {
 	if errors.As(err, &galatFiber) {
 		kode = galatFiber.Code
 		pesan = galatFiber.Message
+	}
+
+	if kode == fiber.StatusInternalServerError {
+		log.Println("Galat internal:", err.Error())
 	}
 
 	return c.Status(kode).JSON(fiber.Map{

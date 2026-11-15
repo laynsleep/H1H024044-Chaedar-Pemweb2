@@ -6,7 +6,6 @@ import (
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	gormLogger "gorm.io/gorm/logger"
 )
 
 var DB *gorm.DB
@@ -22,7 +21,7 @@ func HubungkanBasisData(konf Konfigurasi) {
 	)
 
 	koneksi, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
-		Logger: gormLogger.Default.LogMode(gormLogger.Info),
+		// Logger: gormLogger.Default.LogMode(gormLogger.Info),
 	})
 	if err != nil {
 		log.Fatal("Gagal terhubung ke basis data: ", err)
