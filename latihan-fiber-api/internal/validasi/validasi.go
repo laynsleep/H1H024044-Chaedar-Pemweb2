@@ -6,6 +6,24 @@ import (
 
 var pemeriksa = validator.New()
 
+func init() {
+	_ = pemeriksa.RegisterValidation("nim", validasiNIM)
+}
+
+func validasiNIM(fl validator.FieldLevel) bool {
+	nim := fl.Field().String()
+
+	if len(nim) < 2 {
+		return false
+	}
+
+	if nim[0] != 'H' {
+		return false
+	}
+
+	return nim[1] >= '0' && nim[1] <= '9'
+}
+
 type PesanGalat struct {
 	Field string `json:"field"`
 	Pesan string `json:"pesan"`
@@ -43,6 +61,8 @@ func susunPesan(item validator.FieldError) string {
 		return "Nilai tidak boleh kurang dari " + item.Param()
 	case "lte":
 		return "Nilai tidak boleh lebih dari " + item.Param()
+	case "nim":
+		return "NIM harus diawali huruf H diikuti angka"
 	default:
 		return "Nilai tidak memenuhi aturan " + item.Tag()
 	}

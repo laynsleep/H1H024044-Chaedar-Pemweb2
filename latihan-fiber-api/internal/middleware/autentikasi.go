@@ -3,6 +3,7 @@ package middleware
 import (
 	"latihan-fiber-api/internal/auth"
 	"latihan-fiber-api/internal/config"
+	"latihan-fiber-api/internal/repository"
 	"strconv"
 	"strings"
 
@@ -30,6 +31,15 @@ func Autentikasi() fiber.Handler {
 			return fiber.NewError(fiber.StatusUnauthorized, "Token tidak valid atau sudah kadaluwarsa")
 		}
 
+		dicabut, err := repository.TokenSudahDicabut(auth.HashToken(bagian[1]))
+		if err != nil {
+			return fiber.NewError(fiber.StatusInternalServerError, "Gagal memeriksa status token")
+		}
+
+		if dicabut {
+			return fiber.NewError(fiber.StatusUnauthorized, "Token sudah dicabut, silakan login kembali")
+		}
+
 		id, err := strconv.ParseUint(klaim.Subject, 10, 64)
 		if err != nil {
 			return fiber.NewError(fiber.StatusUnauthorized, "Isi token tidak sesuai")
@@ -37,6 +47,8 @@ func Autentikasi() fiber.Handler {
 
 		c.Locals("id_pengguna", uint(id))
 		c.Locals("peran", klaim.Peran)
+		c.Locals("klaim", klaim)
+		c.Locals("token_mentah", bagian[1])
 
 		return c.Next()
 	}

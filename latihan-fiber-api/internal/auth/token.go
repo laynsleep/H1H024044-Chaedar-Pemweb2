@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"strconv"
 	"time"
@@ -29,6 +31,12 @@ func TerbitkanToken(idPengguna uint, peran string, rahasia string, ttlMenit int)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, klaim)
 
 	return token.SignedString([]byte(rahasia))
+}
+
+func HashToken(nilaiToken string) string {
+	ringkasan := sha256.Sum256([]byte(nilaiToken))
+
+	return hex.EncodeToString(ringkasan[:])
 }
 
 func PeriksaToken(nilaiToken string, rahasia string) (*Klaim, error) {

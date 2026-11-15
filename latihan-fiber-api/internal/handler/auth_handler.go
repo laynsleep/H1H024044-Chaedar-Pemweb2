@@ -1,9 +1,12 @@
 package handler
 
 import (
+	"time"
+
 	"latihan-fiber-api/internal/auth"
 	"latihan-fiber-api/internal/config"
 	"latihan-fiber-api/internal/model"
+	"latihan-fiber-api/internal/repository"
 	"latihan-fiber-api/internal/validasi"
 
 	"github.com/gofiber/fiber/v3"
@@ -110,5 +113,60 @@ func Profil(c fiber.Ctx) error {
 	return c.JSON(fiber.Map{
 		"sukses": true,
 		"data":   pengguna,
+	})
+}
+
+func Segarkan(c fiber.Ctx) error {
+	idPengguna, cocok := c.Locals("id_pengguna").(uint)
+	if !cocok {
+		return fiber.NewError(fiber.StatusUnauthorized, "Identitas pengguna tidak ditemukan pada token")
+	}
+
+	peran, cocok := c.Locals("peran").(string)
+	if !cocok {
+		return fiber.NewError(fiber.StatusUnauthorized, "Peran pengguna tidak ditemukan pada token")
+	}
+
+	konf := config.Muat()
+
+	token, err := auth.TerbitkanToken(idPengguna, peran, konf.JwtSecret, konf.JwtTtlMenit)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, "Gagal menerbitkan token baru")
+	}
+
+	return c.JSON(fiber.Map{
+		"sukses": true,
+		"pesan":  "Token berhasil disegarkan",
+		"data": fiber.Map{
+			"token":                   token,
+			"kadaluwarsa_dalam_menit": konf.JwtTtlMenit,
+		},
+	})
+}
+
+func Logout(c fiber.Ctx) error {
+	tokenMentah, cocok := c.Locals("token_mentah").(string)
+	if !cocok || tokenMentah == "" {
+		return fiber.NewError(fiber.StatusUnauthorized, "Token tidak ditemukan pada permintaan")
+	}
+
+	idPengguna, _ := c.Locals("id_pengguna").(uint)
+
+	kadaluwarsa := time.Now().Add(time.Duration(config.Muat().JwtTtlMenit) * time.Minute)
+
+	if klaim, ok := c.Locals("klaim").(*auth.Klaim); ok && klaim.ExpiresAt != nil {
+		kadaluwarsa = klaim.ExpiresAt.Time
+	}
+
+	err := repository.CabutToken(auth.HashToken(tokenMentah), idPengguna, kadaluwarsa)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, "Gagal mencabut token")
+	}
+
+	_ = repository.BersihkanTokenDicabut()
+
+	return c.JSON(fiber.Map{
+		"sukses": true,
+		"pesan":  "Logout berhasil, token telah dicabut",
 	})
 }
