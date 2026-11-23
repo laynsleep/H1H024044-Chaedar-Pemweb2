@@ -1,10 +1,8 @@
 import klien from "./klien";
+import { bodyLogin } from "./konfigurasiApi";
 
 export async function login(email, kataSandi) {
-    const respons = await klien.post('/auth/login', {
-        email: email,
-        kata_sandi: kataSandi,
-    })
+    const respons = await klien.post('/auth/login', bodyLogin(email, kataSandi))
 
     return respons.data
 }

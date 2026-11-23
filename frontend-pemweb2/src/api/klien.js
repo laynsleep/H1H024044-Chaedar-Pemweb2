@@ -1,7 +1,8 @@
 import axios from 'axios'
+import { api, normalisasiGalat, normalisasiMeta } from './konfigurasiApi'
 
 const klien = axios.create({
-    baseURL: import.meta.env.VITE_API_FIBER,
+    baseURL: api.baseURL,
     headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
@@ -18,8 +19,21 @@ klien.interceptors.request.use((konfigurasi) => {
 })
 
 klien.interceptors.response.use(
-    (respons) => respons,
+    (respons) => {
+        if (respons.data && respons.data.meta) {
+            respons.data.meta = normalisasiMeta(respons.data.meta)
+        }
+
+        return respons
+    },
     (galat) => {
+        if (galat.response && galat.response.data) {
+            galat.response.data = {
+                ...galat.response.data,
+                ...normalisasiGalat(galat.response.data),
+            }
+        }
+
         if (galat.response && galat.response.status === 401) {
             sessionStorage.removeItem('token')
             window.location.href = '/login'

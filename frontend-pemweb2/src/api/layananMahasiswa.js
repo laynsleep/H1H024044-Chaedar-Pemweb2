@@ -1,7 +1,10 @@
 import klien from "./klien";
+import { parameterHalaman } from "./konfigurasiApi";
 
-export async function ambilDaftarMahasiswa(parameter) {
-    const respons = await klien.get('/mahasiswa', { params: parameter })
+export async function ambilDaftarMahasiswa({ halaman, ...parameter }) {
+    const respons = await klien.get('/mahasiswa', {
+        params: { ...parameter, ...parameterHalaman(halaman) },
+    })
 
     return respons.data
 }

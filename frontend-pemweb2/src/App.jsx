@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import Login from "./halaman/Login";
 import DaftarMahasiswa from "./halaman/DaftarMahasiswa";
+import TambahMahasiswa from "./halaman/TambahMahasiswa";
 import RuteTerlindungi from "./komponen/RuteRelindungi";
 
 export default function App() {
@@ -14,6 +15,14 @@ export default function App() {
           element={
             <RuteTerlindungi>
               <DaftarMahasiswa />
+            </RuteTerlindungi>
+          }
+        />
+        <Route
+          path="/mahasiswa/tambah"
+          element={
+            <RuteTerlindungi>
+              <TambahMahasiswa />
             </RuteTerlindungi>
           }
         />
