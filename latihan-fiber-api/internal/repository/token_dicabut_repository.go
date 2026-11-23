@@ -26,7 +26,7 @@ func TokenSudahDicabut(hashToken string) (bool, error) {
 
 	err := config.DB.
 		Model(&model.TokenDicabut{}).
-		Where("hash_token = ? AND kedaluwarsa_pada > ?", hashToken, time.Now()).
+		Where("hash_token = ? AND kadaluwarsa_pada > ?", hashToken, time.Now()).
 		Count(&jumlah).Error
 
 	return jumlah > 0, err
@@ -34,6 +34,6 @@ func TokenSudahDicabut(hashToken string) (bool, error) {
 
 func BersihkanTokenDicabut() error {
 	return config.DB.
-		Where("kedaluwarsa_pada <= ?", time.Now()).
+		Where("kadaluwarsa_pada <= ?", time.Now()).
 		Delete(&model.TokenDicabut{}).Error
 }
