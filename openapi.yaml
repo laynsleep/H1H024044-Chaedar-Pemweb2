@@ -1,0 +1,100 @@
+openapi: 3.0.3
+info:
+  title: API Praktikum Pemrograman Web II
+  description: Layanan pengelolaan data mahasiswa
+  version: 1.0.0
+servers:
+  - url: http://127.0.0.1:8000/api
+    description: Server pengembangan Laravel
+  - url: http://localhost:3000/api
+    description: Server pengembangan Fiber
+paths:
+  /mahasiswa:
+    get:
+      summary: Menampilkan daftar mahasiswa
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: cari
+          in: query
+          schema:
+            type: string
+        - name: angkatan
+          in: query
+          schema:
+            type: integer
+        - name: per_halaman
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Daftar mahasiswa berhasil diambil
+        '401':
+          description: Belum terautentikasi
+    post:
+      summary: Menambah data mahasiswa
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InputMahasiswa'
+      responses:
+        '201':
+          description: Data berhasil dibuat
+        '422':
+          description: Data gagal validasi
+  /mahasiswa/{id}:
+    get:
+      summary: Menampilkan satu data mahasiswa
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Data ditemukan
+        '404':
+          description: Data tidak ditemukan
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    InputMahasiswa:
+      type: object
+      required:
+      - program_studi_id
+      - nim
+      - nama
+      - email
+      - angkatan
+      properties:
+        program_studi_id:
+          type: integer
+          example: 1
+        nim:
+          type: string
+          example: H1A125001
+        nama:
+          type: string
+          example: Eko Saputra
+        email:
+          type: string
+          format: email
+        angkatan:
+          type: integer
+          example: 2025
+        ipk:
+          type: number
+          format: float
+          example: 3.55
